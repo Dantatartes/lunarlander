@@ -30,9 +30,9 @@ def train_dqn(agent, env, n_episodes=2000, max_t=1000,
             score += reward
             if done:
                 break 
-        scores_window.append(score)       # save most recent score
-        scores.append(score)              # save most recent score
-        eps = max(eps_end, eps_decay*eps) # decrease epsilon
+        scores_window.append(score)        # save most recent score
+        scores.append(score)               # save most recent score
+        eps = max(eps_end, eps_decay*eps)  # decrease epsilon
         print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)), end="")
         if i_episode % 100 == 0:
             print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
