@@ -21,7 +21,8 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 class Agent:
     """Interacts with and learns from the environment."""
 
-    def __init__(self, state_size, action_size, seed, dueling=False):
+    def __init__(self, state_size, action_size, seed,
+                 dueling=False, double=False):
         """Initialize an Agent object.
         
         Params
@@ -33,6 +34,7 @@ class Agent:
         self.state_size = state_size
         self.action_size = action_size
         self.seed = random.seed(seed)
+        self.double = double
 
         # Q-Network
         if not dueling:
@@ -89,9 +91,16 @@ class Agent:
         """
         states, actions, rewards, next_states, dones = experiences
 
-        # Get max predicted Q values (for next states) from target model
-        Q_targets_next = self.qnetwork_target(next_states).detach().max(1)[0].unsqueeze(1)
-        # Compute Q targets for current states 
+        if self.double:
+            # get greedy actions (for next states) from local model
+            Q_local_argmax = self.qnetwork_local(next_states).detach().argmax(dim=1).unsqueeze(1)
+            # get predicted q values (for next states) from target model indexed by q_local_argmax
+            Q_targets_next = self.qnetwork_target(next_states).gather(1, Q_local_argmax).detach()
+        else:
+            # get max predicted q values (for next states) from target model
+            Q_targets_next = self.qnetwork_target(next_states).detach().max(1)[0].unsqueeze(1)
+
+        # Compute Q targets for current states
         Q_targets = rewards + (gamma * Q_targets_next * (1 - dones))
 
         # Get expected Q values from local model
