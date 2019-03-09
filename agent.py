@@ -29,6 +29,8 @@ class Agent:
             state_size (int): dimension of each state
             action_size (int): dimension of each action
             seed (int): random seed
+            dueling (bool): use dueling dqn architecture or not
+            double (bool): use double dqn architecture or not
         """
         self.state_size = state_size
         self.action_size = action_size
@@ -36,19 +38,17 @@ class Agent:
         self.double = double
 
         # Q-Network
-        if not dueling:
-            self.qnetwork_local = QNetwork(state_size, action_size, seed).to(device)
-            self.qnetwork_target = QNetwork(state_size, action_size, seed).to(device)
-        elif dueling:
+        if dueling:
             self.qnetwork_local = DuelingDQN(state_size, action_size, seed).to(device)
             self.qnetwork_target = DuelingDQN(state_size, action_size, seed).to(device)
+        else:
+            self.qnetwork_local = QNetwork(state_size, action_size, seed).to(device)
+            self.qnetwork_target = QNetwork(state_size, action_size, seed).to(device)
         self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=LR)
 
         # Replay memory
         self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, seed)
-        # Initialize time step (for updating every UPDATE_EVERY steps)
-        self.t_step = 0
-    
+
     def step(self, state, action, reward, next_state, done):
         # Save experience in replay memory
         self.memory.add(state, action, reward, next_state, done)
@@ -142,7 +142,7 @@ class ReplayBuffer:
         self.batch_size = batch_size
         self.experience = namedtuple("Experience", field_names=["state", "action", "reward", "next_state", "done"])
         self.seed = random.seed(seed)
-    
+
     def add(self, state, action, reward, next_state, done):
         """Add a new experience to memory."""
         e = self.experience(state, action, reward, next_state, done)

@@ -40,8 +40,9 @@ class DuelingDQN(nn.Module):
             state_size (int): Dimension of each state
             action_size (int): Dimension of each action
             seed (int): Random seed
-            fc1_units (int): Number of nodes in first hidden layer
-            fc2_units (int): Number of nodes in second hidden layer
+            fc1_size (int): Number of nodes in first hidden layer
+            fc2_size (int): Number of nodes in second hidden layer
+            fc3_size (int): Number of nodes in third hidden layer
         """
         super(DuelingDQN, self).__init__()
         self.seed = torch.manual_seed(seed)

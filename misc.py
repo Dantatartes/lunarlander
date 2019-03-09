@@ -15,6 +15,7 @@ def train_dqn(agent, env, n_episodes=2000, max_t=1000,
         eps_start (float): starting value of epsilon, for epsilon-greedy action selection
         eps_end (float): minimum value of epsilon
         eps_decay (float): multiplicative factor (per episode) for decreasing epsilon
+        save_as (str): name of file with trained agent
     """
     scores = []                        # list containing scores from each episode
     scores_window = deque(maxlen=100)  # last 100 scores
@@ -46,13 +47,12 @@ def train_dqn(agent, env, n_episodes=2000, max_t=1000,
 def watch_agent(agent, env, how_many=3):
     for i in range(how_many):
         state = env.reset()
-        for j in range(200):
-            action = agent.act(state)
+        while True:
             env.render()
+            action = agent.act(state)
             state, reward, done, _ = env.step(action)
             if done:
                 break
-
     env.close()
 
 
